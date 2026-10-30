@@ -1,0 +1,104 @@
+app:
+  ip: "0.0.0.0:2222"        # Адрес и порт, на котором стартует auth-сервер
+  mode: "development"        # Режим работы приложения (prod/dev)
+  url: "anubis.ru"          # Базовый URL auth-сервера (issuer/audience для JWT)
+  version: "local"          # Версия приложения (для логов/отладки)
+  trusted_host_suffixes:
+    - "chanki.ru"
+    - "test.ru"
+
+postgres:
+  host: "localhost"
+  port: 5432
+  user: "anubis_user"
+  password: "password"
+  database: "anubis_db"
+  sslmode: "disable"
+  max_pool: 20              # Максимальный пул соединений PostgreSQL
+
+mongo:
+  user: "root_user"
+  password: "root_pass"
+  host: "localhost"
+  port: "27017"
+  database: "anubis"
+  max_pool: 100
+  timeout_s: 60             # Таймаут подключения к MongoDB
+
+jwt:
+  access_token_secret: "access_token_secret"   # Секрет для подписи access-токенов
+  refresh_token_secret: "access_token_secret"  # Секрет для refresh-токенов
+  ticket_token_secret: "ticket_token_secret"   # Секрет для login-ticket
+  access_token_minute: 100                     # TTL access-токена
+  refresh_token_minute: 1000                   # TTL refresh-токена / срока жизни сессии
+
+list_services:
+  chanki:                   # Имя домена/проекта, который использует auth-сервер
+    bd_name: "anubis"       # Идентификатор для БД (имя арендатора/сервиса)
+    state_secret: "state_secret"   # Секрет для генерации и проверки OAuth state
+    single_workspace: false           # Если true — у пользователя может быть только 1 проект
+    single_member: false            # Если true — в проекте может быть только 1 участник
+    default_max_members: 10         # Дефолтный лимит участников для НОВЫХ проектов в домене
+    max_devices_user: 3             # Максимальное количество устройств на пользователя
+
+    webhook:
+      token_revoked: "https://anubis.buisnese_server.com/api/token_revoked"
+      # URL бизнес-сервера, куда auth отправляет webhook при ревокации refresh-токена
+
+    # roles — справочник ролей в workspace_members.role для этого домена.
+    # Роль может быть:
+    # - базовая: "owner"
+    # - с вариантом: "manager:all"
+    # Сами значения ("owner", "manager:all") будут записываться в БД и попадать в JWT (claim "role").
+    roles:
+      owner:
+        code: "O"
+        description: "Владелец проекта"
+      admin:
+        code: "A"
+        description: "Администратор проекта"
+      user:
+        code: "U"
+        description: "Пользователь"
+      guest:
+        code: "G"
+        description: "Гость"
+      manager:
+        code: "M"
+        description: "Менеджер"
+        variants:
+          all:
+            description: "Доступ ко всей клиентской базе"
+          once:
+            description: "Доступ к одной записи/клиенту"
+
+    auth:
+      - "phone"            # Разрешена авторизация по телефону
+      - "email"            # Разрешена авторизация по email
+      - "oauth2"           # Разрешена авторизация через OAuth-провайдеров
+
+    provider_oauth:
+
+      google:
+        client_id: "client_id_google"         # Google OAuth client_id
+        client_secret: "client_secret_google" # Google OAuth client_secret
+        redirect_url: "https://chanki.example.com/auth/oauth2/callback/google"
+        # redirect_url — сюда Google отправляет код авторизации
+        redirect: "https://buisnese_server.com/tiket"
+        # redirect — куда auth-сервер отправляет login-ticket после обработки callback
+
+      yandex:
+        client_id: "client_id_yandex"
+        client_secret: "client_secret_yandex"
+        redirect_url: "https://chanki.example.com/auth/oauth2/callback/yandex"
+        # redirect_url — callback auth-сервера
+        redirect: "https://buisnese_server.com/tiket"
+        # redirect — фронтовый URL, куда улетает ticket
+
+      telegram:
+        client_id: ""                           # Не используется в Telegram Login Widget
+        client_secret: "bot_token"              # bot_token для проверки подписи Telegram
+        redirect_url: "https://chanki.example.com/auth/oauth2/callback/yandex"
+        # redirect_url — НЕ используется Telegram, можно оставить пустым или любым
+        redirect: "https://buisnese_server.com/tiket"
+        # redirect — URL фронтенда, куда auth-сервер отправляет login-ticket

@@ -3,64 +3,65 @@ package middlewares
 import (
 	"anubis/app/core"
 	"anubis/app/core/schemes"
-	"anubis/tools/utils"
+	"anubis/internal/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
 )
 
 const (
-	UserIDKey   = "user-id"
-	UserRole    = "user-role"
-	UserProject = "user-project"
+	UserIDKey = "user-id"
 )
 
 func JwtAuthMiddleware(config core.ServiceConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var authToken string
+		// IMPORTANT (compatibility):
+		// - Prefer Authorization: Bearer <token> (standard).
+		// - Keep backward compatibility with cookie-based token ("access_token" / legacy "Authorization").
+		authToken := extractTokenFromRequest(c, "access_token")
 
-		// First, check if the token is present in cookies
-		if cookie, err := c.Cookie("Authorization"); err == nil {
-			authToken = cookie
-		} else {
-
-			authToken = c.Request.Header.Get("Authorization")
-			if len(authToken) == 0 {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, schemes.HTTPError{
-					Code: 99,
-					Err:  "Unable to find token",
-				})
-				return
-			}
-		}
-
-		// Validate the token
-		authorized, _ := utils.IsAuthorized(authToken, config.AccessTokenSecret)
-		if authorized {
-			var authClaims schemes.JwtCustomClaims
-			err := utils.ExtractToken(authToken, config.AccessTokenSecret, &authClaims)
-			if err != nil {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, schemes.HTTPError{
-					Code: 97,
-					Err:  "BAD token",
-				})
-				return
-			}
-			data := strings.Split(authClaims.D, "|")
-			if len(data) >= 2 {
-				c.Set(UserProject, data[0])
-				c.Set(UserRole, data[1])
-			}
-			c.Set(UserIDKey, authClaims.RegisteredClaims.Subject)
-			c.Request.Header.Set(UserIDKey, authClaims.RegisteredClaims.Subject)
-			c.Next()
+		if authToken == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, schemes.HTTPError{
+				Code: 99,
+				Err:  "Unable to find token",
+			})
 			return
 		}
 
-		c.AbortWithStatusJSON(http.StatusUnauthorized, schemes.HTTPError{
-			Code: 98,
-			Err:  "Not authorized",
-		})
+		// Validate + parse token in one pass (signature + exp + algorithm checks).
+		var authClaims schemes.JwtCustomClaims
+		if err := utils.ExtractToken(authToken, config.JWT.AccessTokenSecret, &authClaims, "", make([]string, 0)); err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, schemes.HTTPError{
+				Code: 97,
+				Err:  "BAD token",
+			})
+			return
+		}
+
+		c.Set(UserIDKey, authClaims.RegisteredClaims.Subject)
+		c.Request.Header.Set(UserIDKey, authClaims.RegisteredClaims.Subject)
+		c.Next()
 		return
 	}
+}
+
+func extractTokenFromRequest(c *gin.Context, preferredCookieName string) string {
+	// 1) Standard: Authorization: Bearer <token>
+	h := strings.TrimSpace(c.GetHeader("Authorization"))
+	if h != "" {
+		if len(h) > 7 && strings.EqualFold(h[:7], "bearer ") {
+			return strings.TrimSpace(h[7:])
+		}
+		// Backward compat: allow raw token in Authorization header
+		return h
+	}
+
+	// 2) Cookie: preferred cookie name first
+	if preferredCookieName != "" {
+		if v, err := c.Cookie(preferredCookieName); err == nil {
+			return strings.TrimSpace(v)
+		}
+	}
+
+	return ""
 }

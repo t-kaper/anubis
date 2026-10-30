@@ -25,12 +25,18 @@ func GetClientIP(ctx *gin.Context) string {
 }
 
 func GetDeviceType(ctx *gin.Context) string {
-	deviceType := ctx.GetHeader("User-Agent")
+	// Prefer explicit client-sent device marker (mobile/web/etc).
+	deviceType := strings.TrimSpace(ctx.GetHeader("X-Device"))
 	if deviceType == "" {
-		// Если заголовок X-Device не присутствует, используем User-Agent
-		deviceType = ctx.GetHeader("X-Device")
-	} else {
-		deviceType = "_"
+		deviceType = strings.TrimSpace(ctx.Request.UserAgent())
+	}
+	if deviceType == "" {
+		return "_"
+	}
+	// Prevent unbounded storage/logging.
+	const maxLen = 256
+	if len(deviceType) > maxLen {
+		deviceType = deviceType[:maxLen]
 	}
 	return deviceType
 }

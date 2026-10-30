@@ -1,0 +1,2364 @@
+{
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "schemes": [
+        "https",
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Сервер авторизации (OAuth2, токены, проекты) с конфигурацией по доменам.",
+        "title": "Anubis — сервис авторизации",
+        "contact": {},
+        "version": "local"
+    },
+    "basePath": "/",
+    "paths": {
+        "/auth/all_logout": {
+            "post": {
+                "description": "Деактивирует все сессии пользователя-владельца refresh_token по всем доменам/устройствам.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout отовсюду",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.LogoutAllValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_core_schemes.EmptyResponses"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/exchange_ticket": {
+            "post": {
+                "description": "Обменивает одноразовый login-ticket на refresh_token (и список проектов).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Обмен login-ticket на refresh",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "ticket + device_id",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.ExchangeTicketValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.AnswerExchangeTicketToken"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/introspect": {
+            "post": {
+                "description": "Проверяет access token и возвращает active=true/false и claims.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Introspect access token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "token",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.IntrospectValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.IntrospectResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "description": "Деактивирует все сессии этого устройства во всех доменах для пользователя-владельца refresh_token.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout устройства (все домены)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + device_id",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.LogoutDeviceValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_core_schemes.EmptyResponses"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "description": "Возвращает информацию из access-токена: user_id, workspace_id, role, expires_at.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Текущий пользователь (me)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer \u003caccess_token\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.MeResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/oauth2/callback/{provider}": {
+            "get": {
+                "description": "Callback от OAuth2-провайдера. Валидирует state, создаёт/линкует пользователя и возвращает (или редиректит) login ticket.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "OAuth2: callback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Провайдер (google|yandex)",
+                        "name": "provider",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Код авторизации OAuth2",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "OAuth2 state",
+                        "name": "state",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.AnswerTicketToken"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "302": {
+                        "description": "Редирект на фронт (ticket или error_code)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/oauth2/login/{provider}": {
+            "get": {
+                "description": "Редиректит пользователя на страницу логина OAuth2-провайдера. Требуется query-параметр device_id. Возвращает 302.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "OAuth2: редирект на провайдера",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Провайдер (google|yandex)",
+                        "name": "provider",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maxLength": 64,
+                        "minLength": 12,
+                        "type": "string",
+                        "description": "Идентификатор устройства",
+                        "name": "device_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fallback JSON (ok: true)",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "302": {
+                        "description": "Редирект на провайдера",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/refresh_token": {
+            "post": {
+                "description": "Ротация refresh_token и выпуск нового access_token для выбранного workspace_id (привязано к device_id).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Обновление токенов",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + workspace_id + device_id",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.RefreshTokenDomainValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.AnswerToken"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/revoke": {
+            "post": {
+                "description": "Отзывает конкретный refresh token (деактивирует соответствующую сессию).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Revoke refresh token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token (+ optional device_id)",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.RevokeValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_core_schemes.EmptyResponses"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/telegram/login_widget": {
+            "post": {
+                "description": "Проверяет подпись Telegram Login Widget и возвращает одноразовый login-ticket.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Telegram Login Widget",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "Payload Telegram + device_id",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.TelegramLoginWidgetDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.AnswerTicketToken"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/virtual/login": {
+            "post": {
+                "description": "Проверяет login/password виртуального пользователя и возвращает login-ticket (для обмена через /auth/exchange_ticket).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Вход виртуального пользователя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "device_id + login + password",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.VirtualLoginValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.AnswerTicketToken"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/ping": {
+            "get": {
+                "description": "Простой health-check эндпоинт.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Ping",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ping_auth": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Health-check эндпоинт, требующий валидный access token.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Ping (JWT защищённый)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/roles": {
+            "post": {
+                "description": "Возвращает роли домена (code/description/variants). Доступно только owner/admin в указанном workspace_id.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Справочник ролей домена",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + workspace_id + device_id",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.RolesValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.RolesResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/add_member": {
+            "post": {
+                "description": "Добавляет target_user_id в workspace_id с указанной ролью (роль может быть с вариантом, например manager:all).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Добавить участника в проект",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + workspace_id + target_user_id + role",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.AddUserToWorkspaceValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_core_schemes.EmptyResponses"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/create": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Создать проект",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + device_id + name",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.CreateWorkspaceValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceInfo"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/delete": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Удалить проект",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + device_id + workspace_id",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.DeleteWorkspaceValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_core_schemes.EmptyResponses"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/invite/create": {
+            "post": {
+                "description": "Создаёт одноразовый invite_token (с TTL). Можно ограничить типом авторизации (auth_method) и для oauth2 — провайдером (oauth2_provider). Только owner/admin.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Создать инвайт в проект",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + device_id + workspace_id + role + auth_method + oauth2_provider",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceInviteCreateValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceInviteCreateResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/remove_member": {
+            "post": {
+                "description": "Удаляет target_user_id из workspace_id. Доступно только owner/admin (по базовой роли).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Удалить участника из проекта",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + workspace_id + target_user_id + device_id",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceRemoveUserValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_core_schemes.EmptyResponses"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/update_member": {
+            "post": {
+                "description": "Меняет роль target_user_id в проекте. Доступно owner/admin (по базовой роли). Назначать/менять owner этим эндпоинтом нельзя.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Обновить роль участника в проекте",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + workspace_id + target_user_id + role",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.UpdateUserToWorkspaceValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_core_schemes.EmptyResponses"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/user/list": {
+            "post": {
+                "description": "Возвращает всех участников проекта с их ролью, флагом is_virtual и типами авторизации (email/phone/virtual/oauth:\u003cprovider\u003e). Только owner/admin.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Список пользователей проекта",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + workspace_id + device_id",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceUserListValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceUserListResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/user/list_public": {
+            "post": {
+                "description": "Возвращает участников проекта (user_id, nickname, role). Доступно любому участнику проекта.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Список пользователей проекта (для участников)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + workspace_id + device_id",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceUserListPublicValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceUserListPublicResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/virtual_user/create": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Создать виртуального пользователя в проекте",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + workspace_id + device_id + login + password + role",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceCreateVirtualUserValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceCreateVirtualUserResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/virtual_user/delete": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Удалить виртуального пользователя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + workspace_id + device_id + user_id",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceDeleteVirtualUserValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceDeleteVirtualUserResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/workspace/virtual_user/update": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Workspace"
+                ],
+                "summary": "Обновить виртуального пользователя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ключ домена (dev). В prod вычисляется из Host.",
+                        "name": "Domain",
+                        "in": "header"
+                    },
+                    {
+                        "description": "refresh_token + workspace_id + device_id + user_id + new_login/new_password",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceUpdateVirtualUserValid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/anubis_app_core_schemes.Responses"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/anubis_app_DTO.WorkspaceUpdateVirtualUserResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.ValidateErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/anubis_app_core_schemes.HTTPError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "anubis_app_DTO.AddUserToWorkspaceValid": {
+            "type": "object",
+            "required": [
+                "refresh_token",
+                "target_user_id",
+                "workspace_id"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "description": "чей refresh — того и считаем инициатором",
+                    "type": "string"
+                },
+                "role": {
+                    "description": "Role — роль участника в проекте. Может быть базовой (\"user\") или с вариантом (\"manager:all\").\nЕсли не передали — бекенд выберет дефолтную (\"user\" -\u003e \"guest\").",
+                    "type": "string"
+                },
+                "target_user_id": {
+                    "description": "какого пользователя добавляем (id в БД)",
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "description": "в какой проект добавляем",
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.AnswerExchangeTicketToken": {
+            "type": "object",
+            "properties": {
+                "list_workspaces": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.AnswerTicketToken": {
+            "type": "object",
+            "properties": {
+                "redirect_url": {
+                    "type": "string"
+                },
+                "ticket": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.AnswerToken": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "list_workspaces": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.CreateWorkspaceValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "name",
+                "refresh_token"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 128
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.DeleteWorkspaceValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "refresh_token",
+                "workspace_id"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.ExchangeTicketValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "ticket"
+            ],
+            "properties": {
+                "device_id": {
+                    "description": "то же device_id, что и раньше",
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "ticket": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.IntrospectResponse": {
+            "type": "object",
+            "properties": {
+                "active": {
+                    "type": "boolean"
+                },
+                "audience": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "expires_at": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "anubis_app_DTO.IntrospectValid": {
+            "type": "object",
+            "required": [
+                "token"
+            ],
+            "properties": {
+                "token": {
+                    "description": "Token — access token",
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.LogoutAllValid": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.LogoutDeviceValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "refresh_token"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.MeResponse": {
+            "type": "object",
+            "properties": {
+                "audience": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "expires_at": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "anubis_app_DTO.RefreshTokenDomainValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "refresh_token",
+                "workspace_id"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.RevokeValid": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.RoleDTO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "variants": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/anubis_app_DTO.RoleVariantDTO"
+                    }
+                }
+            }
+        },
+        "anubis_app_DTO.RoleVariantDTO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.RolesResponse": {
+            "type": "object",
+            "properties": {
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/anubis_app_DTO.RoleDTO"
+                    }
+                }
+            }
+        },
+        "anubis_app_DTO.RolesValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "refresh_token",
+                "workspace_id"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.TelegramLoginWidgetDTO": {
+            "type": "object",
+            "required": [
+                "auth_date",
+                "device_id",
+                "first_name",
+                "hash",
+                "id"
+            ],
+            "properties": {
+                "auth_date": {
+                    "description": "unix timestamp",
+                    "type": "integer"
+                },
+                "device_id": {
+                    "description": "твой device_id",
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "hash": {
+                    "description": "подпись от Telegram",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "telegram user_id",
+                    "type": "integer"
+                },
+                "invite_token": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 10
+                },
+                "last_name": {
+                    "description": "опционально",
+                    "type": "string"
+                },
+                "photo_url": {
+                    "description": "опционально",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "опционально",
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.UpdateUserToWorkspaceValid": {
+            "type": "object",
+            "required": [
+                "refresh_token",
+                "role",
+                "target_user_id",
+                "workspace_id"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "target_user_id": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.VirtualLoginValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "login",
+                "password"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "login": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 3
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 6
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceCreateVirtualUserResponse": {
+            "type": "object",
+            "properties": {
+                "login": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceCreateVirtualUserValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "login",
+                "password",
+                "refresh_token",
+                "role",
+                "workspace_id"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "login": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 3
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 6
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "role": {
+                    "description": "Роль в проекте для виртуала. Если не указать — можно по умолчанию \"user\"/\"member\".",
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceDeleteVirtualUserResponse": {
+            "type": "object",
+            "properties": {
+                "deleted": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceDeleteVirtualUserValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "refresh_token",
+                "user_id",
+                "workspace_id"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "workspace_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "max_members": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceInviteCreateResponse": {
+            "type": "object",
+            "properties": {
+                "auth_method": {
+                    "type": "string"
+                },
+                "expires_at_unix": {
+                    "type": "integer"
+                },
+                "invite_token": {
+                    "type": "string"
+                },
+                "oauth2_provider": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceInviteCreateValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "refresh_token",
+                "workspace_id"
+            ],
+            "properties": {
+                "auth_method": {
+                    "type": "string"
+                },
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "oauth2_provider": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceRemoveUserValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "refresh_token",
+                "target_user_id",
+                "workspace_id"
+            ],
+            "properties": {
+                "device_id": {
+                    "description": "девайс того, кто делает запрос",
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "target_user_id": {
+                    "description": "кого кикаем",
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceUpdateVirtualUserResponse": {
+            "type": "object",
+            "properties": {
+                "login": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceUpdateVirtualUserValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "refresh_token",
+                "user_id",
+                "workspace_id"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "new_login": {
+                    "description": "новые данные (можно менять только одно из полей)",
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 3
+                },
+                "new_password": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 6
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "description": "какого юзера меняем",
+                    "type": "integer"
+                },
+                "workspace_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceUserListItem": {
+            "type": "object",
+            "properties": {
+                "auth_types": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "is_virtual": {
+                    "type": "boolean"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceUserListPublicResponse": {
+            "type": "object",
+            "properties": {
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/anubis_app_DTO.WorkspaceUserPublicItem"
+                    }
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceUserListPublicValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "refresh_token",
+                "workspace_id"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceUserListResponse": {
+            "type": "object",
+            "properties": {
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/anubis_app_DTO.WorkspaceUserListItem"
+                    }
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceUserListValid": {
+            "type": "object",
+            "required": [
+                "device_id",
+                "refresh_token",
+                "workspace_id"
+            ],
+            "properties": {
+                "device_id": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 12
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_DTO.WorkspaceUserPublicItem": {
+            "type": "object",
+            "properties": {
+                "nickname": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "anubis_app_core_schemes.EmptyResponses": {
+            "type": "object"
+        },
+        "anubis_app_core_schemes.HTTPError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_core_schemes.Responses": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {}
+            }
+        },
+        "anubis_app_core_schemes.ValidateError": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "anubis_app_core_schemes.ValidateErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/anubis_app_core_schemes.ValidateError"
+                    }
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Формат: \"Bearer \u003caccess_token\u003e\"",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "tags": [
+        {
+            "description": "Авторизация, OAuth2, токены",
+            "name": "Auth"
+        },
+        {
+            "description": "Проекты и участники проектов",
+            "name": "Workspace"
+        },
+        {
+            "description": "Проверки здоровья сервиса",
+            "name": "Health"
+        }
+    ]
+}

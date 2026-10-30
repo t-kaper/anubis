@@ -1,0 +1,1534 @@
+basePath: /
+consumes:
+- application/json
+definitions:
+  anubis_app_DTO.AddUserToWorkspaceValid:
+    properties:
+      refresh_token:
+        description: чей refresh — того и считаем инициатором
+        type: string
+      role:
+        description: |-
+          Role — роль участника в проекте. Может быть базовой ("user") или с вариантом ("manager:all").
+          Если не передали — бекенд выберет дефолтную ("user" -> "guest").
+        type: string
+      target_user_id:
+        description: какого пользователя добавляем (id в БД)
+        type: string
+      workspace_id:
+        description: в какой проект добавляем
+        type: string
+    required:
+    - refresh_token
+    - target_user_id
+    - workspace_id
+    type: object
+  anubis_app_DTO.AnswerExchangeTicketToken:
+    properties:
+      list_workspaces:
+        additionalProperties:
+          type: string
+        type: object
+      refresh_token:
+        type: string
+    type: object
+  anubis_app_DTO.AnswerTicketToken:
+    properties:
+      redirect_url:
+        type: string
+      ticket:
+        type: string
+    type: object
+  anubis_app_DTO.AnswerToken:
+    properties:
+      access_token:
+        type: string
+      list_workspaces:
+        additionalProperties:
+          type: string
+        type: object
+      refresh_token:
+        type: string
+    type: object
+  anubis_app_DTO.CreateWorkspaceValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      name:
+        maxLength: 128
+        type: string
+      refresh_token:
+        type: string
+    required:
+    - device_id
+    - name
+    - refresh_token
+    type: object
+  anubis_app_DTO.DeleteWorkspaceValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      refresh_token:
+        type: string
+      workspace_id:
+        type: string
+    required:
+    - device_id
+    - refresh_token
+    - workspace_id
+    type: object
+  anubis_app_DTO.ExchangeTicketValid:
+    properties:
+      device_id:
+        description: то же device_id, что и раньше
+        maxLength: 64
+        minLength: 12
+        type: string
+      ticket:
+        type: string
+    required:
+    - device_id
+    - ticket
+    type: object
+  anubis_app_DTO.IntrospectResponse:
+    properties:
+      active:
+        type: boolean
+      audience:
+        items:
+          type: string
+        type: array
+      expires_at:
+        type: integer
+      role:
+        type: string
+      user_id:
+        type: integer
+      workspace_id:
+        type: integer
+    type: object
+  anubis_app_DTO.IntrospectValid:
+    properties:
+      token:
+        description: Token — access token
+        type: string
+    required:
+    - token
+    type: object
+  anubis_app_DTO.LogoutAllValid:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  anubis_app_DTO.LogoutDeviceValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      refresh_token:
+        type: string
+    required:
+    - device_id
+    - refresh_token
+    type: object
+  anubis_app_DTO.MeResponse:
+    properties:
+      audience:
+        items:
+          type: string
+        type: array
+      expires_at:
+        type: integer
+      role:
+        type: string
+      user_id:
+        type: integer
+      workspace_id:
+        type: integer
+    type: object
+  anubis_app_DTO.RefreshTokenDomainValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      refresh_token:
+        type: string
+      workspace_id:
+        type: string
+    required:
+    - device_id
+    - refresh_token
+    - workspace_id
+    type: object
+  anubis_app_DTO.RevokeValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  anubis_app_DTO.RoleDTO:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      variants:
+        additionalProperties:
+          $ref: '#/definitions/anubis_app_DTO.RoleVariantDTO'
+        type: object
+    type: object
+  anubis_app_DTO.RoleVariantDTO:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+    type: object
+  anubis_app_DTO.RolesResponse:
+    properties:
+      roles:
+        items:
+          $ref: '#/definitions/anubis_app_DTO.RoleDTO'
+        type: array
+    type: object
+  anubis_app_DTO.RolesValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      refresh_token:
+        type: string
+      workspace_id:
+        type: string
+    required:
+    - device_id
+    - refresh_token
+    - workspace_id
+    type: object
+  anubis_app_DTO.TelegramLoginWidgetDTO:
+    properties:
+      auth_date:
+        description: unix timestamp
+        type: integer
+      device_id:
+        description: твой device_id
+        maxLength: 64
+        minLength: 12
+        type: string
+      first_name:
+        type: string
+      hash:
+        description: подпись от Telegram
+        type: string
+      id:
+        description: telegram user_id
+        type: integer
+      invite_token:
+        maxLength: 128
+        minLength: 10
+        type: string
+      last_name:
+        description: опционально
+        type: string
+      photo_url:
+        description: опционально
+        type: string
+      username:
+        description: опционально
+        type: string
+    required:
+    - auth_date
+    - device_id
+    - first_name
+    - hash
+    - id
+    type: object
+  anubis_app_DTO.UpdateUserToWorkspaceValid:
+    properties:
+      refresh_token:
+        type: string
+      role:
+        type: string
+      target_user_id:
+        type: string
+      workspace_id:
+        type: string
+    required:
+    - refresh_token
+    - role
+    - target_user_id
+    - workspace_id
+    type: object
+  anubis_app_DTO.VirtualLoginValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      login:
+        maxLength: 64
+        minLength: 3
+        type: string
+      password:
+        maxLength: 128
+        minLength: 6
+        type: string
+    required:
+    - device_id
+    - login
+    - password
+    type: object
+  anubis_app_DTO.WorkspaceCreateVirtualUserResponse:
+    properties:
+      login:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  anubis_app_DTO.WorkspaceCreateVirtualUserValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      login:
+        maxLength: 64
+        minLength: 3
+        type: string
+      password:
+        maxLength: 128
+        minLength: 6
+        type: string
+      refresh_token:
+        type: string
+      role:
+        description: Роль в проекте для виртуала. Если не указать — можно по умолчанию
+          "user"/"member".
+        type: string
+      workspace_id:
+        type: string
+    required:
+    - device_id
+    - login
+    - password
+    - refresh_token
+    - role
+    - workspace_id
+    type: object
+  anubis_app_DTO.WorkspaceDeleteVirtualUserResponse:
+    properties:
+      deleted:
+        type: boolean
+    type: object
+  anubis_app_DTO.WorkspaceDeleteVirtualUserValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      refresh_token:
+        type: string
+      user_id:
+        type: integer
+      workspace_id:
+        type: string
+    required:
+    - device_id
+    - refresh_token
+    - user_id
+    - workspace_id
+    type: object
+  anubis_app_DTO.WorkspaceInfo:
+    properties:
+      id:
+        type: integer
+      max_members:
+        type: integer
+      name:
+        type: string
+    type: object
+  anubis_app_DTO.WorkspaceInviteCreateResponse:
+    properties:
+      auth_method:
+        type: string
+      expires_at_unix:
+        type: integer
+      invite_token:
+        type: string
+      oauth2_provider:
+        type: string
+      role:
+        type: string
+    type: object
+  anubis_app_DTO.WorkspaceInviteCreateValid:
+    properties:
+      auth_method:
+        type: string
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      oauth2_provider:
+        type: string
+      refresh_token:
+        type: string
+      role:
+        type: string
+      workspace_id:
+        type: string
+    required:
+    - device_id
+    - refresh_token
+    - workspace_id
+    type: object
+  anubis_app_DTO.WorkspaceRemoveUserValid:
+    properties:
+      device_id:
+        description: девайс того, кто делает запрос
+        maxLength: 64
+        minLength: 12
+        type: string
+      refresh_token:
+        type: string
+      target_user_id:
+        description: кого кикаем
+        type: string
+      workspace_id:
+        type: string
+    required:
+    - device_id
+    - refresh_token
+    - target_user_id
+    - workspace_id
+    type: object
+  anubis_app_DTO.WorkspaceUpdateVirtualUserResponse:
+    properties:
+      login:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  anubis_app_DTO.WorkspaceUpdateVirtualUserValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      new_login:
+        description: новые данные (можно менять только одно из полей)
+        maxLength: 64
+        minLength: 3
+        type: string
+      new_password:
+        maxLength: 128
+        minLength: 6
+        type: string
+      refresh_token:
+        type: string
+      user_id:
+        description: какого юзера меняем
+        type: integer
+      workspace_id:
+        type: string
+    required:
+    - device_id
+    - refresh_token
+    - user_id
+    - workspace_id
+    type: object
+  anubis_app_DTO.WorkspaceUserListItem:
+    properties:
+      auth_types:
+        items:
+          type: string
+        type: array
+      is_virtual:
+        type: boolean
+      nickname:
+        type: string
+      role:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  anubis_app_DTO.WorkspaceUserListPublicResponse:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/anubis_app_DTO.WorkspaceUserPublicItem'
+        type: array
+    type: object
+  anubis_app_DTO.WorkspaceUserListPublicValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      refresh_token:
+        type: string
+      workspace_id:
+        type: string
+    required:
+    - device_id
+    - refresh_token
+    - workspace_id
+    type: object
+  anubis_app_DTO.WorkspaceUserListResponse:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/anubis_app_DTO.WorkspaceUserListItem'
+        type: array
+    type: object
+  anubis_app_DTO.WorkspaceUserListValid:
+    properties:
+      device_id:
+        maxLength: 64
+        minLength: 12
+        type: string
+      refresh_token:
+        type: string
+      workspace_id:
+        type: string
+    required:
+    - device_id
+    - refresh_token
+    - workspace_id
+    type: object
+  anubis_app_DTO.WorkspaceUserPublicItem:
+    properties:
+      nickname:
+        type: string
+      role:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  anubis_app_core_schemes.EmptyResponses:
+    type: object
+  anubis_app_core_schemes.HTTPError:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+    type: object
+  anubis_app_core_schemes.Responses:
+    properties:
+      code:
+        type: integer
+      data: {}
+    type: object
+  anubis_app_core_schemes.ValidateError:
+    properties:
+      field:
+        type: string
+      msg:
+        type: string
+    type: object
+  anubis_app_core_schemes.ValidateErrorResponse:
+    properties:
+      code:
+        type: integer
+      error:
+        items:
+          $ref: '#/definitions/anubis_app_core_schemes.ValidateError'
+        type: array
+    type: object
+info:
+  contact: {}
+  description: Сервер авторизации (OAuth2, токены, проекты) с конфигурацией по доменам.
+  title: Anubis — сервис авторизации
+  version: local
+paths:
+  /auth/all_logout:
+    post:
+      consumes:
+      - application/json
+      description: Деактивирует все сессии пользователя-владельца refresh_token по
+        всем доменам/устройствам.
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.LogoutAllValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_core_schemes.EmptyResponses'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Logout отовсюду
+      tags:
+      - Auth
+  /auth/exchange_ticket:
+    post:
+      consumes:
+      - application/json
+      description: Обменивает одноразовый login-ticket на refresh_token (и список
+        проектов).
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: ticket + device_id
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.ExchangeTicketValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.AnswerExchangeTicketToken'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Обмен login-ticket на refresh
+      tags:
+      - Auth
+  /auth/introspect:
+    post:
+      consumes:
+      - application/json
+      description: Проверяет access token и возвращает active=true/false и claims.
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: token
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.IntrospectValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.IntrospectResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+      summary: Introspect access token
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Деактивирует все сессии этого устройства во всех доменах для пользователя-владельца
+        refresh_token.
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + device_id
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.LogoutDeviceValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_core_schemes.EmptyResponses'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Logout устройства (все домены)
+      tags:
+      - Auth
+  /auth/me:
+    get:
+      description: 'Возвращает информацию из access-токена: user_id, workspace_id,
+        role, expires_at.'
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.MeResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Текущий пользователь (me)
+      tags:
+      - Auth
+  /auth/oauth2/callback/{provider}:
+    get:
+      description: Callback от OAuth2-провайдера. Валидирует state, создаёт/линкует
+        пользователя и возвращает (или редиректит) login ticket.
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: Провайдер (google|yandex)
+        in: path
+        name: provider
+        required: true
+        type: string
+      - description: Код авторизации OAuth2
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: OAuth2 state
+        in: query
+        name: state
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.AnswerTicketToken'
+              type: object
+        "302":
+          description: Редирект на фронт (ticket или error_code)
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: 'OAuth2: callback'
+      tags:
+      - Auth
+  /auth/oauth2/login/{provider}:
+    get:
+      description: Редиректит пользователя на страницу логина OAuth2-провайдера. Требуется
+        query-параметр device_id. Возвращает 302.
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: Провайдер (google|yandex)
+        in: path
+        name: provider
+        required: true
+        type: string
+      - description: Идентификатор устройства
+        in: query
+        maxLength: 64
+        minLength: 12
+        name: device_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Fallback JSON (ok: true)'
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "302":
+          description: Редирект на провайдера
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: 'OAuth2: редирект на провайдера'
+      tags:
+      - Auth
+  /auth/refresh_token:
+    post:
+      consumes:
+      - application/json
+      description: Ротация refresh_token и выпуск нового access_token для выбранного
+        workspace_id (привязано к device_id).
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + workspace_id + device_id
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.RefreshTokenDomainValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.AnswerToken'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Обновление токенов
+      tags:
+      - Auth
+  /auth/revoke:
+    post:
+      consumes:
+      - application/json
+      description: Отзывает конкретный refresh token (деактивирует соответствующую
+        сессию).
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token (+ optional device_id)
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.RevokeValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_core_schemes.EmptyResponses'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Revoke refresh token
+      tags:
+      - Auth
+  /auth/telegram/login_widget:
+    post:
+      consumes:
+      - application/json
+      description: Проверяет подпись Telegram Login Widget и возвращает одноразовый
+        login-ticket.
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: Payload Telegram + device_id
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.TelegramLoginWidgetDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.AnswerTicketToken'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Telegram Login Widget
+      tags:
+      - Auth
+  /auth/virtual/login:
+    post:
+      consumes:
+      - application/json
+      description: Проверяет login/password виртуального пользователя и возвращает
+        login-ticket (для обмена через /auth/exchange_ticket).
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: device_id + login + password
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.VirtualLoginValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.AnswerTicketToken'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Вход виртуального пользователя
+      tags:
+      - Auth
+  /ping:
+    get:
+      description: Простой health-check эндпоинт.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Ping
+      tags:
+      - Health
+  /ping_auth:
+    get:
+      description: Health-check эндпоинт, требующий валидный access token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Ping (JWT защищённый)
+      tags:
+      - Health
+  /roles:
+    post:
+      consumes:
+      - application/json
+      description: Возвращает роли домена (code/description/variants). Доступно только
+        owner/admin в указанном workspace_id.
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + workspace_id + device_id
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.RolesValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.RolesResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Справочник ролей домена
+      tags:
+      - Workspace
+  /workspace/add_member:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет target_user_id в workspace_id с указанной ролью (роль
+        может быть с вариантом, например manager:all).
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + workspace_id + target_user_id + role
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.AddUserToWorkspaceValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_core_schemes.EmptyResponses'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Добавить участника в проект
+      tags:
+      - Workspace
+  /workspace/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + device_id + name
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.CreateWorkspaceValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.WorkspaceInfo'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Создать проект
+      tags:
+      - Workspace
+  /workspace/delete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + device_id + workspace_id
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.DeleteWorkspaceValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_core_schemes.EmptyResponses'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Удалить проект
+      tags:
+      - Workspace
+  /workspace/invite/create:
+    post:
+      consumes:
+      - application/json
+      description: Создаёт одноразовый invite_token (с TTL). Можно ограничить типом
+        авторизации (auth_method) и для oauth2 — провайдером (oauth2_provider). Только
+        owner/admin.
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + device_id + workspace_id + role + auth_method
+          + oauth2_provider
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.WorkspaceInviteCreateValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.WorkspaceInviteCreateResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Создать инвайт в проект
+      tags:
+      - Workspace
+  /workspace/remove_member:
+    post:
+      consumes:
+      - application/json
+      description: Удаляет target_user_id из workspace_id. Доступно только owner/admin
+        (по базовой роли).
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + workspace_id + target_user_id + device_id
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.WorkspaceRemoveUserValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_core_schemes.EmptyResponses'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Удалить участника из проекта
+      tags:
+      - Workspace
+  /workspace/update_member:
+    post:
+      consumes:
+      - application/json
+      description: Меняет роль target_user_id в проекте. Доступно owner/admin (по
+        базовой роли). Назначать/менять owner этим эндпоинтом нельзя.
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + workspace_id + target_user_id + role
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.UpdateUserToWorkspaceValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_core_schemes.EmptyResponses'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Обновить роль участника в проекте
+      tags:
+      - Workspace
+  /workspace/user/list:
+    post:
+      consumes:
+      - application/json
+      description: Возвращает всех участников проекта с их ролью, флагом is_virtual
+        и типами авторизации (email/phone/virtual/oauth:<provider>). Только owner/admin.
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + workspace_id + device_id
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.WorkspaceUserListValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.WorkspaceUserListResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Список пользователей проекта
+      tags:
+      - Workspace
+  /workspace/user/list_public:
+    post:
+      consumes:
+      - application/json
+      description: Возвращает участников проекта (user_id, nickname, role). Доступно
+        любому участнику проекта.
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + workspace_id + device_id
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.WorkspaceUserListPublicValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.WorkspaceUserListPublicResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Список пользователей проекта (для участников)
+      tags:
+      - Workspace
+  /workspace/virtual_user/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + workspace_id + device_id + login + password +
+          role
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.WorkspaceCreateVirtualUserValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.WorkspaceCreateVirtualUserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Создать виртуального пользователя в проекте
+      tags:
+      - Workspace
+  /workspace/virtual_user/delete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + workspace_id + device_id + user_id
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.WorkspaceDeleteVirtualUserValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.WorkspaceDeleteVirtualUserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Удалить виртуального пользователя
+      tags:
+      - Workspace
+  /workspace/virtual_user/update:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Ключ домена (dev). В prod вычисляется из Host.
+        in: header
+        name: Domain
+        type: string
+      - description: refresh_token + workspace_id + device_id + user_id + new_login/new_password
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/anubis_app_DTO.WorkspaceUpdateVirtualUserValid'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/anubis_app_core_schemes.Responses'
+            - properties:
+                data:
+                  $ref: '#/definitions/anubis_app_DTO.WorkspaceUpdateVirtualUserResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.ValidateErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/anubis_app_core_schemes.HTTPError'
+      summary: Обновить виртуального пользователя
+      tags:
+      - Workspace
+produces:
+- application/json
+schemes:
+- https
+- http
+securityDefinitions:
+  BearerAuth:
+    description: 'Формат: "Bearer <access_token>"'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
+tags:
+- description: Авторизация, OAuth2, токены
+  name: Auth
+- description: Проекты и участники проектов
+  name: Workspace
+- description: Проверки здоровья сервиса
+  name: Health

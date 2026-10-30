@@ -1,29 +1,41 @@
+### ---------- BUILDER ----------
 FROM golang:1.23-alpine AS builder
 
-# Устанавливаем зависимости
+# Добавляем git чтобы go mod мог подтягивать private deps
 RUN apk add --no-cache git
+
+WORKDIR /app
+
+# Копируем только зависимостьные файлы сначала
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Копируем всё остальное
+COPY . .
+
+# Сборка без CGO
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/anubis ./cmd/server/main.go
+
+
+### ---------- FINAL ----------
+FROM alpine:3.19
+
+# Добавляем CA сертификаты (для HTTPS)
+RUN apk add --no-cache ca-certificates tzdata
+
+# Создаём unprivileged user
+RUN adduser -D anubis
+USER anubis
+
+# Копируем бинарь
+COPY --from=builder /app/anubis /usr/local/bin/anubis
 
 # Рабочая директория
 WORKDIR /app
 
-# Копируем go.mod и go.sum (если есть)
-COPY go.mod go.sum ./
-RUN go mod download
+# EXPOSE 1010 # если надо
 
-# Копируем исходный код
-COPY . .
+# Опционально HEALTHCHECK
+HEALTHCHECK CMD pidof anubis || exit 1
 
-# Собираем приложение
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/my_app ./cmd/server/main.go
-
-# Финальный образ (минимальный)
-FROM alpine:latest
-
-# Копируем бинарник из builder
-COPY --from=builder /app/my_app /my_app
-
-# Открываем порт (если приложение слушает 8080)
-# EXPOSE 1010
-
-# Запускаем приложение
-CMD ["/my_app"]
+CMD ["/usr/local/bin/anubis"]

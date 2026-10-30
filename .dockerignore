@@ -1,0 +1,100 @@
+# ============================
+# OS / Editor junk
+# ============================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# ============================
+# Git & CI
+# ============================
+.git/
+.gitignore
+.githooks/
+.github/
+.gitlab/
+.gitlab-ci.yml
+
+# ============================
+# Local environment & configs
+# ============================
+*.env
+*.local.env
+.envrc
+config_local.yaml
+tmp/
+tmp/**
+
+# ============================
+# Logs & runtime files
+# ============================
+*.log
+logs/
+*.pid
+
+# ============================
+# Build artifacts
+# ============================
+bin/
+dist/
+build/
+out/
+*.exe
+*.dll
+*.so
+
+# ============================
+# Dependency management
+# ============================
+vendor/
+node_modules/
+
+# ============================
+# My local scripts & docs
+# ============================
+docs/
+tools/dtb/internal.go
+tools/dtb/mongopool.go
+tools/dtb/pgxpool.go
+tools/providers/*
+tools/**
+tmp/**
+*.md
+
+# ============================
+# Tests
+# ============================
+*_test.go
+coverage.out
+testdata/
+tests/
+
+# ============================
+# Migrations (KEEP THEM!)
+# ============================
+# НЕ убираем migrations — они нужны в контейнере
+# migrations/
+
+# ============================
+# Application folders to exclude
+# ============================
+# Всё, что точно не надо включать в контейнер
+tmp/
+tmp/**
+
+# ============================
+# SQLC-generated artifacts
+# (если не нужны в контейнере)
+# ============================
+tmp/sqlc/
+tmp/sqlc/**
+
+# ============================
+# Swagger
+# (если будешь подключать)
+# ============================
+#swagger.yml
+#swagger.json
+#swagger/

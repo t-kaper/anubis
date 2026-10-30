@@ -23,5 +23,5 @@ go.work
 tmp/.env.bd
 tmp
 sqlc.yaml
-config_server.env
 config_server.yaml
+.env
